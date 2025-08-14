@@ -1,5 +1,7 @@
 #include <unordered_set>
 
+// O(n) time complexity
+
 class Solution {
 public:
     bool containsDuplicate(vector<int>& nums) {
