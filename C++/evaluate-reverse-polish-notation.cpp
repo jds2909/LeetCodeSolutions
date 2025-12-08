@@ -1,51 +1,41 @@
 class Solution {
 public:
-    int evalRPN(vector<string>& tokens) {
-        // define stack
-        stack<int> mystack;
+    int carFleet(int target, vector<int>& position, vector<int>& speed) {
 
-        // for each string t in tokens
-        for (const auto& t : tokens)
+        // vector of pairs storing position & time to arrive
+        vector<pair<int, double>> cars(speed.size());
+
+        // for each car
+        for (int i = 0; i < speed.size(); ++i)
         {
-            // if t is an operator
-            if (isOp(t))
-            {
-                // take b from top & pop
-                int b = mystack.top(); mystack.pop();
-                // take a from top & pop
-                int a = mystack.top(); mystack.pop();
-                // use apply method to calculate and push back to stack
-                mystack.push(apply(a, b, t[0]));
-            }
-            else
-            {
-                // if not an operator, push num to stack
-                mystack.push(stoi(t));
-            }
-        }
-        // answer is left on stack so return
-        return mystack.top();
-    }
-
-private:
-
-    // helper function checks if operator char or more than one char like -2
-    static bool isOp(const string& s)
-    {
-        return s.size() == 1 && (s[0] == '+' || s[0] == '-' || s[0] == '/' || s[0] == '*');
-    }
-
-    // calc helper just returns calculation from input
-    static int apply(int a, int b, char op)
-    {
-        switch (op)
-        {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
+            // arrival time = distance from target / speed
+            double arrivalTime = (double)(target - position[i]) / (double)speed[i];
+            // pair containing position and time to arrive
+            pair<int, double> newPair = { position[i], arrivalTime };
+            // pass all pairs into cars
+            cars[i] = newPair;
         }
 
-        return 0;
+        // sort cars vector by position (closest to furthest from target)
+        // sorts by 1st value of pair by default (good for us)
+        sort(cars.begin(), cars.end());
+
+        // n is always >= 1 so numFleets is always at least 1
+        int numFleets = 1;
+        // set fastest arrival time
+        double earliestArrival = cars.back().second;
+
+        // iterate backwards from 2nd to last (closest to destination first)
+        for (int i = cars.size() - 2; i >= 0; --i)
+        {
+            // if speed is more than previous fleet, increment fleet and update new earliest arrival for new fleet
+            if (cars[i].second > earliestArrival)
+            {
+                ++numFleets;
+                earliestArrival = cars[i].second;
+            }
+        }
+        // return number of fleets
+        return numFleets;
     }
 };
